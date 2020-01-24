@@ -2,6 +2,7 @@
 <template>
 <div>
   <h1>{{title}}</h1>
+  <!-- {{user}} -->
   <form @submit.prevent="registration">
     <md-field :class="{'md-invalid':$v.user.name.$invalid && $v.user.name.$dirty}">
       <label>Name</label>
@@ -28,12 +29,12 @@
       <md-input type="text " required v-model='user.jobTitle' @input="setJobTitle($event)"></md-input>
       <span class="md-error">There is an error</span>
     </md-field>
-    <md-field :class="{'md-invalid':$v.user.address.city.$invalid && $v.user.address.city.$dirty}">
+    <!-- <md-field :class="{'md-invalid':$v.user.address.city.$invalid && $v.user.address.city.$dirty}">
       <label>City</label>
       <md-input type="text " required v-model='user.address.city' @input="setCity($event)"></md-input>
       <span class="md-error">There is an error</span>
-    </md-field>
-    <md-field :class="{'md-invalid':$v.user.address.state.$invalid && $v.user.address.state.$dirty}">
+    </md-field> -->
+    <!-- <md-field :class="{'md-invalid':$v.user.address.state.$invalid && $v.user.address.state.$dirty}">
       <label>State</label>
       <md-input type="text " required v-model='user.address.state' @input="setState($event)"></md-input>
       <span class="md-error">There is an error</span>
@@ -42,7 +43,7 @@
       <label>Counrty</label>
       <md-input type="text " required v-model='user.address.country' @input="setCountry($event)"></md-input>
       <span class="md-error">There is an error</span>
-    </md-field>
+    </md-field> -->
     <div class="c-flex">
       <md-button v-if="editting" type="submit" class="md-raised" :disabled="$v.$invalid">Save</md-button>
       <md-button v-if="!editting" type="submit" class="md-raised" :disabled="$v.$invalid">Register</md-button>
@@ -63,27 +64,30 @@ import {
 } from 'vuelidate/lib/validators'
 export default {
   props: {
+     _id: "",
     title: '',
     userDetails: {},
-    userIndex: ''
+    userIndex: '',
+    userEmail:''
   },
   name: 'Login',
   data: function() {
     return {
-      user:  {
-        name: '',
-        email: '',
-        password: '',
-        company: '',
-        jobTitle: '',
-        address: {
-          city: '',
-          state: '',
-          country: ''
-        }
-      },
+      // user:  {
+      //   name: '',
+      //   email: '',
+      //   password: '',
+      //   company: '',
+      //   jobTitle: '',
+      //   address: {
+      //     city: '',
+      //     state: '',
+      //     country: ''
+      //   }
+      // },
       editting: false,
-      btnName: ""
+      btnName: "",
+      trialUser:this.$store.getters.getUserById
     }
   },
   validations: {
@@ -119,72 +123,91 @@ export default {
     }
   },
   mounted() {
-    if (this.userDetails && Object.keys(this.userDetails).length > 0) {
-      this.editting = true;
-      this.btnName = 'Save';
-      this.user = {
-        name: this.userDetails.name,
-        email: this.userDetails.email,
-        password: this.userDetails.password,
-        company: this.userDetails.company,
-        jobTitle: this.userDetails.jobTitle,
-        address: {
-          city: this.userDetails.address.city,
-          state: this.userDetails.address.state,
-          country: this.userDetails.address.country
-        }
-      }
-    } else {
-      this.editting = false;
-      this.btnName = 'Register';
-      this.user = {
-        name: '',
-        email: '',
-        password: '',
-        company: '',
-        jobTitle: '',
-        address: {
-          city: '',
-          state: '',
-          country: ''
-        }
+    this.user=this.$store.getters.getId;
+    // this.user=
+    // this.trialUser=this.$store.getters.getUserById(this.userIndex)
+    // this.user=this.$store.getters.getUserById(this.userIndex)
+    // if (this.userDetails && Object.keys(this.userDetails).length > 0) {
+    //   this.editting = true;
+    //   this.btnName = 'Save';
+    //   this.user = {
+    //     name: this.userDetails.name,
+    //     email: this.userDetails.email,
+    //     password: this.userDetails.password,
+    //     company: this.userDetails.company,
+    //     jobTitle: this.userDetails.jobTitle,
+    //     address: {
+    //       city: this.userDetails.address.city,
+    //       state: this.userDetails.address.state,
+    //       country: this.userDetails.address.country
+    //     }
+    //   }
+    // } else {
+    //   this.editting = false;
+    //   this.btnName = 'Register';
+    //   this.user = {
+    //     name: '',
+    //     email: '',
+    //     password: '',
+    //     company: '',
+    //     jobTitle: '',
+    //     address: {
+    //       city: '',
+    //       state: '',
+    //       country: ''
+    //     }
+    //   }
+    // }
+  },
+  computed:{
+    user: {
+      set(_id) {
+        console.log("_Id",_id)
+        this.$store.dispatch("setId", _id);
+      },
+      get() {
+        return this.$store.getters.getUserById;
       }
     }
   },
+  beforeCreate(){
+    
+  },
   watch: {
     userDetails: function(newVal, oldVal) {
+      this.trialUser=this.$store.getters.getUserById
       console.log("Inside Watch")
-      if (Object.keys(newVal).length > 0) {
-        this.editting = true;
-        this.btnName = 'Save'
-        this.user = {
-          name: newVal.name,
-          email: newVal.email,
-          password: newVal.password,
-          company: newVal.company,
-          jobTitle: newVal.jobTitle,
-          address: {
-            city: newVal.address.city,
-            state: newVal.address.state,
-            country: newVal.address.country
-          }
-        }
-      } else {
-        this.editting = false;
-        this.btnName = 'Register',
-          this.user = {
-            name: '',
-            email: '',
-            password: '',
-            company: '',
-            jobTitle: '',
-            address: {
-              city: '',
-              state: '',
-              country: ''
-            }
-          }
-      }
+      // if (Object.keys(newVal).length > 0) {
+      //   this.editting = true;
+      //   this.btnName = 'Save'
+      //   this.user = {
+      //     name: newVal.name,
+      //     email: newVal.email,
+      //     password: newVal.password,
+      //     company: newVal.company,
+      //     jobTitle: newVal.jobTitle,
+      //     address: {
+      //       city: newVal.address.city,
+      //       state: newVal.address.state,
+      //       country: newVal.address.country
+      //     }
+      //   }
+      // } else {
+      //   this.editting = false;
+      //   this.btnName = 'Register',
+      //     this.user = {
+      //       name: '',
+      //       email: '',
+      //       password: '',
+      //       company: '',
+      //       jobTitle: '',
+      //       address: {
+      //         city: '',
+      //         state: '',
+      //         country: ''
+      //       }
+      //     }
+      // }
     }
   },
   methods: {

@@ -34,7 +34,7 @@
         <md-table-head>Country</md-table-head>
         <md-table-head>Actions</md-table-head>
       </md-table-row>
-      <md-table-row v-for="(user,index) in userList">
+      <md-table-row v-for="(user,index) in userList" :key="user.email">
         <md-table-cell>{{user.name || 'NA'}}</md-table-cell>
         <md-table-cell>{{user.email || 'NA'}}</md-table-cell>
         <md-table-cell>{{user.company|| 'NA'}}</md-table-cell>
@@ -55,6 +55,8 @@
      v-bind:userDetails="editingUser"
      v-bind:userIndex="userIndex"
      title="Edit User"
+     :_id="userIndex"
+     :userEmail="userIndex"
     @cancelled="cancel()"
     @submitted="saved()"/>
   <md-dialog :md-active.sync="showDialog">
@@ -107,6 +109,7 @@ export default {
       this.editingUser=user
       this.editUser = true
       this.userIndex=index
+      this.$store.dispatch("setId", index);
     },
     cancel(){
       this.editUser = false
